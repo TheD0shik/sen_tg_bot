@@ -1,0 +1,325 @@
+import telebot
+import time,sys
+#import spacy
+import random
+import os
+import pyodbc
+
+# Задайте параметры подключения
+server = 'DESKTOP-VMD5Q4G\\SQLEXPRESS'  
+database = 'senko_tg_bot'  
+conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};Trusted_Connection=yes;'
+# Подключитесь к базе данных
+conn = pyodbc.connect(conn_str)
+# Создайте курсор для выполнения запросов
+cursor = conn.cursor()
+# SQL-команда для создания таблицы
+from telebot import types
+#DESKTOP-VMD5Q4G\SQLEXPRESS
+#.env\Scripts\activate
+tconv = lambda x: time.strftime("%H:%M:%S %d.%m.%Y", time.localtime(x))
+now = time.time()
+sen=telebot.TeleBot('6779540387:AAFzdZDrLe3Rnr4HEnDwjuRRIM6q5Yj5nfE')
+x=1
+y=10000
+z=True
+nums=[1,2,3,4,5,6,7,8,9]
+
+
+print("запуск бота...")
+
+
+logt=f"запуск бота,время запуска:{time.ctime(now)}"
+with open("log.txt", "a+",encoding='utf-8') as log:
+    log.write(f"{str(logt)}\n") 
+    log.close  
+paimon = 'https://polinka.top/pics1/uploads/posts/2023-11/1699889666_polinka-top-p-chibi-genshin-impakt-9.png'
+qiqi = 'https://i.pinimg.com/736x/d4/37/f5/d437f5814e718b9e42e953bfb9b0976c.jpg'
+
+@sen.message_handler(content_types=['new_chat_members'])
+def welcome(message):
+    for member in message.new_chat_members:
+        sen.send_message(message.chat.id, f'приветики {member.full_name}!')
+
+@sen.message_handler(content_types=['left_chat_member'])
+def farewell(message):
+    member = message.left_chat_member
+    sen.send_message(message.chat.id, f'Покеда {member.full_name}!')
+
+@sen.message_handler(content_types=['audio'])
+def get_audio(message):
+    print("Загрузка аудиофайла...")
+    # Получаем информацию о файле
+    file_info = sen.get_file(message.audio.file_id)
+    # Скачиваем файл
+    downloaded_file = sen.download_file(file_info.file_path)
+    # Создаем путь для сохранения файла
+    file_path = os.path.join('files', 'audio', f"{message.audio.file_id}.mp3")
+    # Сохраняем файл локально
+    with open(file_path, 'wb') as new_file:
+        new_file.write(downloaded_file)
+    print("Аудиофайл скачен!")
+    user_name = message.from_user.username
+    user_id = message.from_user.id
+    tet=f"{tconv(message.date)}|пользователь {user_id} под ником:{user_name} загрузил аудио:{message.audio.file_id}"
+    with open("log.txt", "a+",encoding='utf-8') as log:
+            log.write(f"{str(tet)}\n")
+            log.close
+    
+
+@sen.message_handler(content_types=['video'])
+def get_video(message):
+    print("Загрузка видеофайла...")
+    # Получаем информацию о файле
+    file_info = sen.get_file(message.video.file_id)
+    # Скачиваем файл
+    downloaded_file = sen.download_file(file_info.file_path)
+    # Создаем путь для сохранения файла
+    file_path = os.path.join('files', 'video', f"{message.video.file_id}.mp4")
+    # Сохраняем файл локально
+    with open(file_path, 'wb') as new_file:
+        new_file.write(downloaded_file)
+    print("Видеофайл скачен!")
+    user_name = message.from_user.username
+    user_id = message.from_user.id
+    tet=f"{tconv(message.date)}|пользователь {user_id} под ником:{user_name} загрузил видео:{message.video.file_id}"
+    with open("log.txt", "a+",encoding='utf-8') as log:
+            log.write(f"{str(tet)}\n")
+            log.close
+
+
+@sen.message_handler(content_types=['photo'])
+def get_photo(message):
+    print("Загрузка фотографии...")
+    # Получаем информацию о файле
+    file_info = sen.get_file(message.photo[-1].file_id)
+    # Скачиваем файл
+    downloaded_file = sen.download_file(file_info.file_path)
+    # Создаем путь для сохранения файла
+    file_path = os.path.join('files', 'photo', f"{message.photo[-1].file_id}.jpg")
+    # Сохраняем файл локально
+    with open(file_path, 'wb') as new_file:
+        new_file.write(downloaded_file)
+    print("Фотография скачена!")
+    user_name = message.from_user.username
+    user_id = message.from_user.id
+    tet=f"{tconv(message.date)}|пользователь {user_id} под ником:{user_name} загрузил фото:{message.photo[-1].file_id}"
+    with open("log.txt", "a+",encoding='utf-8') as log:
+            log.write(f"{str(tet)}\n")
+            log.close
+            
+r=[]
+@sen.message_handler(commands=['startsen'])
+def main(message):
+    user_name = message.from_user.username
+    user_id = message.from_user.id
+    select_query = 'SELECT USERID FROM USERS WHERE USERID = ?;'
+    cursor.execute(select_query, (user_id,))
+    row = cursor.fetchone()
+    if row is None:
+        insert_query = 'INSERT INTO USERS (USERID, USERNAME) VALUES (?, ?);'
+        cursor.execute(insert_query, (user_id, user_name))
+        conn.commit()
+        sen.send_message(message.chat.id, "поздравляю, вы теперь в базе данных")
+    else:
+        sen.send_message(message.chat.id, "вы уже смешарик")
+   
+@sen.message_handler(commands=['game1'])
+def main(message):
+    
+    mark = types.ReplyKeyboardMarkup()
+    k=types.KeyboardButton('камень')
+    n=types.KeyboardButton('ножницы')
+    mark.row(k,n)
+    b=types.KeyboardButton('бумага')
+    mark.row(b)
+    sen.send_message(message.chat.id,'приветик,давай сыграем в камень ножницы бумагу!',reply_markup=mark)
+    
+@sen.message_handler(commands=['test'])
+def main(message):
+    user_name = message.from_user.username
+    user_id = message.from_user.id
+    
+    sen.send_photo(message.chat.id, photo=paimon)
+    logt=f"{tconv(message.date)}|пользователь {user_id} под ником:{user_name} провел тест бота"
+    print(logt)
+    with open("log.txt", "a+",encoding='utf-8') as log:
+        log.write(f"{str(logt)}\n")
+        log.close
+        
+@sen.message_handler(commands=['qwerty'])
+def main(message):
+    user_name = message.from_user.username
+    user_id = message.from_user.id
+    logt=f"{tconv(message.date)}|пользователь {user_id} под ником:{user_name} остановил бота"
+    sen.send_message(message.chat.id,'закрытие бота...')
+    with open("log.txt", "a+",encoding='utf-8') as log:
+        log.write(f"{str(logt)}\n")
+        log.close
+        #sen.close\
+        cursor.close()
+        conn.close()
+        print("перезапуск бота...")
+        sen.polling(non_stop=False)
+        
+
+        
+@sen.message_handler()
+def handle(message):
+    user_name = message.from_user.username
+    user_id = message.from_user.id 
+    #1-камень
+    #2-ножницы
+    #3-бумага
+    insert_query = 'INSERT INTO logs (times,id,names,messag) VALUES (?,?,?,?);'
+    cursor.execute(insert_query,(tconv(message.date) ,user_id, user_name, message.text))
+    conn.commit()
+    select_query = 'SELECT USERID FROM USERS WHERE USERID = ?;'
+    cursor.execute(select_query, (user_id,))
+    row = cursor.fetchone()
+    if row is None:
+        insert_query = 'INSERT INTO USERS (USERID, USERNAME) VALUES (?, ?);'
+        cursor.execute(insert_query, (user_id, user_name))
+        conn.commit()
+        tet=f"{tconv(message.date)}|пользователь {user_id} под ником:{user_name} добавлен в базу данных"
+        with open("log.txt", "a+",encoding='utf-8') as log:
+            log.write(f"{str(tet)}\n")
+            log.close
+        print(user_name,' добавлен в базу')
+        
+    print(message.text)
+    if (message.text.lower() =='камень'.lower()):
+        ran=random.randrange(1, 4)
+        if (ran==1):
+            sen.send_message(message.chat.id,'камень')
+            sen.send_message(message.chat.id,'ничья')
+        if (ran==2):
+            sen.send_message(message.chat.id,'ножницы')
+            sen.send_message(message.chat.id,'ты выйграл!')
+        if (ran==3):
+            sen.send_message(message.chat.id,'бумага')
+            sen.send_message(message.chat.id,'ты проиграл')
+        
+    if (message.text.lower() =='ножницы'.lower()):
+        ran=random.randrange(1, 4)
+        if (ran==1):
+            sen.send_message(message.chat.id,'камень')
+            sen.send_message(message.chat.id,'ты проиграл')
+        if (ran==2):
+            sen.send_message(message.chat.id,'ножницы')
+            sen.send_message(message.chat.id,'ничья')
+        if (ran==3):
+            sen.send_message(message.chat.id,'бумага')
+            sen.send_message(message.chat.id,'ты выйграл!')
+        
+    if (message.text.lower() =='бумага'.lower()):
+        ran=random.randrange(1, 4)
+        if (ran==1):
+            sen.send_message(message.chat.id,'камень')
+            sen.send_message(message.chat.id,'ты выйграл!')
+        if (ran==2):
+            sen.send_message(message.chat.id,'ножницы')
+            sen.send_message(message.chat.id,'ты проиграл')
+        if (ran==3):
+            sen.send_message(message.chat.id,'бумага')
+            sen.send_message(message.chat.id,'ничья')
+       #s = s.replace('сенко', '', 1)
+    s=message.text       
+   
+
+    if 'хапр'.lower() in s.lower():
+            sen.send_photo(message.chat.id, photo=qiqi)
+    if 'сенко'.lower() in s.lower():
+        
+    #Хапр
+  
+        
+        if 'кто'.lower() in s.lower():
+            with open("user_names.txt", "r", encoding='utf-8') as log:
+                user_names = log.readlines()
+                user_names = [name.strip() for name in user_names]  # Удаление символов новой строки
+                if user_names:
+                    random_name = random.choice(user_names)
+                    rn = random.choice(nums)
+                    if(rn==1):
+                        sen.send_message(message.chat.id, f'чича из гроба ху тао выкрикивает что это @{random_name}')
+                    if(rn==2):
+                        sen.send_message(message.chat.id, f'звёзы говорят что это @{random_name}')
+                    if(rn==3):
+                        sen.send_message(message.chat.id, f'я думаю что это @{random_name}')
+                    if(rn==4):
+                        sen.send_message(message.chat.id, f'@{random_name} или не @{random_name},вот в чём вопрос')
+                    if(rn==5):
+                        sen.send_message(message.chat.id, f'это @{random_name},100%')
+                    if(rn==6):
+                        sen.send_message(message.chat.id, f'это @{random_name},зуб даю')
+                    if(rn==7):
+                        sen.send_message(message.chat.id, f'доска уиджи показала что это @{random_name}')
+                    if(rn==8):
+                        sen.send_message(message.chat.id, f'проверьте @{random_name}')
+                    if(rn==9):
+                        sen.send_message(message.chat.id, f'@{random_name}')
+                else:
+                    sen.send_message(message.chat.id, 'Список имен пуст.')
+        if 'переведи в двоичный'.lower() in s.lower():
+            #spacy
+            s = s.replace('сенко переведи в двоичный', '', 1)
+            sb = bin(int(s))
+            sen.send_message(message.chat.id, f'{s}-->{sb[2:]}')
+        if 'рп'.lower() in s.lower():
+            if 'добавь'.lower() in s.lower():
+                select_query = 'SELECT id FROM userrp WHERE id = ?;'
+                cursor.execute(select_query, (user_id,))
+                row = cursor.fetchone()
+                if row is None:
+                    insert_query = 'INSERT INTO userrp (id,names,descriptions,unventori,charter,location) VALUES (?, ?, ?, ?, ?,?);'
+                    inv = f'unventori_{user_id}_{user_name}'
+                    cursor.execute(insert_query, (user_id, user_name, 'данных пока нет', inv, 'данных пока нет','мондштат'))
+                    conn.commit()
+
+                    create_table_query = f'''
+                    CREATE TABLE {inv} (
+                        id VARCHAR(50),
+                        quantity VARCHAR(50)
+                    );
+                    '''
+                    cursor.execute(create_table_query)
+                    conn.commit()
+                    sen.send_message(message.chat.id, "поздравляю, вы теперь в рп процессе")
+                else:
+                    sen.send_message(message.chat.id, "вы уже в рп")    
+        if 'магазинчик'.lower() in s.lower():
+            soo=f"выбирай:\n"
+            cursor.execute('SELECT * FROM item')
+            columns = [column[0] for column in cursor.description]
+            soo=f'{soo}{'|'.join(columns)}\n'
+            for row in cursor.fetchall():
+                soo=f'{soo}{'|'.join(str(item) for item in row)}\n'
+            sen.send_message(message.chat.id, f"{soo}") 
+        
+    else:        
+        if s.lower()=='бонькнуть'.lower():
+            if message.reply_to_message and message.reply_to_message.from_user:
+                username = message.reply_to_message.from_user.username
+            else:
+                username = user_name
+            sen.send_message(message.chat.id, f"@{username} ,ты бака")
+            sen.send_message(message.chat.id, "*боньк*")
+            sen.send_message(message.chat.id, ":3")
+        if s.lower()=='погладить'.lower():
+            username = message.reply_to_message.from_user.username
+            sen.send_message(message.chat.id, f"*@{username} сенко хочет вас погладить*")
+            sen.send_message(message.chat.id, "*гладь гладь гладь*")
+            sen.send_message(message.chat.id, "UWU")
+        if 'укусить'.lower() in s.lower():
+            username = message.reply_to_message.from_user.username
+            sen.send_message(message.chat.id, f"*@{username} сенко хочет вас кусьнють*")
+            sen.send_message(message.chat.id, "*кусь*")
+            sen.send_message(message.chat.id, "^_^")
+        if 'обнять'.lower() in s.lower():
+            username = message.reply_to_message.from_user.username
+            sen.send_message(message.chat.id, f"*@{username} сенко хочет вас обнять*")
+            sen.send_message(message.chat.id, f"*обнимает @{username}*")
+            sen.send_message(message.chat.id, "ня~")
+            
+sen.polling(non_stop=True) 
