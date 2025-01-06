@@ -1,28 +1,22 @@
-import pyodbc
+import psycopg2
 
 # Параметры подключения
-server = 'DESKTOP-VMD5Q4G\\SQLEXPRESS'  
-database = 'senko_tg_bot'  
-# Строка подключения
-connection_string = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};Trusted_Connection=yes;'
+
 
 try:
+    conn = psycopg2.connect(
+        dbname="senko_tg_bot",
+        user="postgres",
+        password="The_D0shik",
+        host="localhost"
+    )
     # Подключение к базе данных
-    connection = pyodbc.connect(connection_string)
-    cursor = connection.cursor()
-
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE testtable121 (id serial PRIMARY KEY, name varchar);")
     # Выполнение простого запроса
-    cursor.execute("SELECT 1")
-    result = cursor.fetchone()
+    conn.commit()
+    cur.close()
+    conn.close()
 
-    if result:
-        print("Подключение успешно и запрос выполнен.")
-    else:
-        print("Запрос не вернул результатов.")
-
-    # Закрытие подключения
-    cursor.close()
-    connection.close()
-
-except pyodbc.Error as ex:
+except psycopg2.Error as ex:
     print("Ошибка подключения к базе данных:", ex)

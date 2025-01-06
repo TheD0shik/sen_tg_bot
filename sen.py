@@ -6,6 +6,7 @@ import random
 import os
 import sys
 import pyodbc
+import psycopg2
 
 import config
 
@@ -35,6 +36,12 @@ y=10000
 z=True
 nums=[1,2,3,4,5,6,7,8,9]
 
+conn = psycopg2.connect(
+        dbname=config.dbnamec,
+        user=config.userc,
+        password=config.passwordc,
+        host=config.hostc
+    )
 
 def get_user_info(table_name, id_column, id_value):
     # SQL-запрос для получения строки
