@@ -7,7 +7,7 @@ try:
     conn = psycopg2.connect(
         dbname="senko_tg_bot",
         user="postgres",
-        password="The_D0shik",
+        password="",
         host="localhost"
     )
     # Подключение к базе данных
