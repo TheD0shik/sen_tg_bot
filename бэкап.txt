@@ -5,29 +5,6 @@ import random
 import os
 import pyodbc
 
-# Задайте параметры подключения
-server = 'DESKTOP-VMD5Q4G\\SQLEXPRESS'  
-database = 'senko_tg_bot'  
-conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};Trusted_Connection=yes;'
-# Подключитесь к базе данных
-conn = pyodbc.connect(conn_str)
-# Создайте курсор для выполнения запросов
-cursor = conn.cursor()
-# SQL-команда для создания таблицы
-from telebot import types
-#DESKTOP-VMD5Q4G\SQLEXPRESS
-#.env\Scripts\activate
-tconv = lambda x: time.strftime("%H:%M:%S %d.%m.%Y", time.localtime(x))
-now = time.time()
-sen=telebot.TeleBot('6779540387:AAFzdZDrLe3Rnr4HEnDwjuRRIM6q5Yj5nfE')
-x=1
-y=10000
-z=True
-nums=[1,2,3,4,5,6,7,8,9]
-
-
-print("запуск бота...")
-
 
 logt=f"запуск бота,время запуска:{time.ctime(now)}"
 with open("log.txt", "a+",encoding='utf-8') as log:
