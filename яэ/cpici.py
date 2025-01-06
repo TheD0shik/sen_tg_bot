@@ -3,10 +3,7 @@ import telebot
 from telebot.async_telebot import AsyncTeleBot
 from characterai import pycai
 
-sen=telebot.TeleBot('7341040063:AAEQDpm85uxyg6xrGGqCg_8qOWz-xGvcoIA')#токен
-char = '2-IwcgqJb4BUzVBv2J3d9Pe3NbiaMFr2dl7oNf6-Iok'#бот
-#char ='pW4CWZO96QeyVvR22iBAR7uWRQ1kfhKolfpYKda11eQ'
-client =  pycai.Client('74a212327a64233a5997b05795f5596a85543629')#апи
+
 me = client.get_me()
 print("запуск бота...")
 with client.connect() as chat:
